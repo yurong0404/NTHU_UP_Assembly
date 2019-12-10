@@ -5,8 +5,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/ptrace.h>
-extern char __data_start;
-extern char __bss_start;
+#include <string.h>
 
 void errquit(const char *msg) {
 	perror(msg);
@@ -26,23 +25,26 @@ int main(int argc, char *argv[]) {
 		errquit("execvp");
 	} else {
 		int status;
-		unsigned long output;
-		unsigned long addr;
+		long output;
+		long addr;
 		if(waitpid(child, &status, 0) < 0) errquit("waitpid");
 		ptrace(PTRACE_SETOPTIONS, child, 0, PTRACE_O_EXITKILL|PTRACE_O_TRACEEXIT);
 		ptrace(PTRACE_CONT, child, 0, 0);
 		waitpid(child, &status, 0);
 		ptrace(PTRACE_CONT, child, 0, 0);
 		waitpid(child, &status, 0);	
-//		while(1)
-//		{
 		printf("pid: %d\ndata section: \n", child);
 		scanf("%lx", &addr);
-		output = ptrace(PTRACE_PEEKTEXT, child, addr, 0);
-		printf("%lx\n", output);
-		//}
+		char str[100];
+		for (int i=0; i<10;i++)
+		{
+			output = ptrace(PTRACE_PEEKDATA, child, addr+i*8, 0);
+			memcpy(str+i*8, &output, 8);
+			//printf("%s", &output);
+		}
+		printf("%s", str);
+		printf("\n");
 		perror("done");
 	}
 	return 0;
 }
-
