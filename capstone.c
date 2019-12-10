@@ -43,20 +43,15 @@ int main()
 		{
 			for (int i=0; i<count; i++)
 			{
-				//printf("%s", insn[i].mnemonic);
-
 				for(int x=0; insn[i].mnemonic[x]!='\0'; x++)
 					printf("%02x", insn[i].mnemonic[x]);
 				
-				//printf(" ");
 				if (strlen(insn[i].op_str)>0)
 					printf("%02x", ' ');
 
 				for(int x=0; insn[i].op_str[x]!='\0'; x++)
 					printf("%02x", insn[i].op_str[x]);
-				//printf("%s", insn[i].op_str);
 
-				//printf("\n");
 				printf("%02x", '\n');
 			}
 			cs_free(insn, count);
